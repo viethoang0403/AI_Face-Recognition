@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Registration System</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <h1>Face Registration System</h1>
+
+<!--            <h2>Register Face</h2>-->
+            <form id="register-form">
+                <label for="user_id">Enter User ID:</label>
+                <input type="text" id="user_id" name="user_id" required>
+                <button type="submit">Register Face</button>
+            </form>
+            <p id="status-message" style="color: green;"></p>
+
+<!--            <h2>Train Model</h2>-->
+            <button onclick="trainModel()">Train Model</button>
+            <p id="train-message" style="color: green;"></p>
+
+<!--            <h2>Delete All Faces</h2>-->
+            <button onclick="deleteFaces()">Delete All</button>
+
+<!--            <h2>Stream</h2>-->
+            <button onclick="startStream()">Start Stream</button>
+            <p id="stream-message" style="color: green;"></p>
+
+        <!--    <h2>Stream</h2>-->
+        <!--    <button onclick="startStream()">Start Stream</button>-->
+        <!--    <button onclick="stopStream()">Stop Stream</button>-->
+        <!--    <p id="stream-message" style="color: purple;"></p>-->
+        <!--    <div>-->
+        <!--        <img id="video-stream" src="/video_feed" alt="Video Stream">-->
+        <!--    </div>-->
+
+            <script>
+                // Xử lý đăng ký khuôn mặt
+                document.getElementById("register-form").addEventListener("submit", async function (e) {
+                    e.preventDefault(); // Ngăn tải lại trang
+                    const userId = document.getElementById("user_id").value;
+                    const statusMessage = document.getElementById("status-message");
+
+                    if (!userId) {
+                        statusMessage.textContent = "Please enter a valid User ID.";
+                        statusMessage.style.color = "red";
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch("/register", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            body: new URLSearchParams({ user_id: userId })
+                        });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            statusMessage.textContent = data.message;
+                            statusMessage.style.color = "green";
+                        } else {
+                            statusMessage.textContent = data.message || "An error occurred.";
+                            statusMessage.style.color = "red";
+                        }
+                    } catch (error) {
+                        statusMessage.textContent = "Failed to connect to the server.";
+                        statusMessage.style.color = "red";
+                    }
+
+                    // Xóa input sau khi gửi
+                    document.getElementById("user_id").value = "";
+                });
+
+                // Xử lý huấn luyện mô hình
+                async function trainModel() {
+                    const trainMessage = document.getElementById("train-message");
+
+                    try {
+                        const response = await fetch("/train", { method: "POST" });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            trainMessage.textContent = data.message;
+                            trainMessage.style.color = "green";
+                        } else {
+                            trainMessage.textContent = data.message || "An error occurred.";
+                            trainMessage.style.color = "red";
+                        }
+                    } catch (error) {
+                        trainMessage.textContent = "Failed to connect to the server.";
+                        trainMessage.style.color = "red";
+                    }
+                }
+
+                // Xử lý xóa tất cả dữ liệu khuôn mặt
+                async function deleteFaces() {
+                    const response = await fetch('/delete_faces', { method: 'POST' });
+                    const data = await response.json();
+                    alert(data.message);
+                }
+
+                // Xử lý phát trực tiếp
+                async function startStream() {
+                    const streamMessage = document.getElementById("stream-message");
+
+                    try {
+                        const response = await fetch("/stream", { method: "POST" });
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            streamMessage.textContent = data.message;
+                            streamMessage.style.color = "green";
+                        } else {
+                            streamMessage.textContent = data.message || "An error occurred.";
+                            streamMessage.style.color = "red";
+                        }
+                    } catch (error) {
+                        streamMessage.textContent = "Failed to connect to the server.";
+                        streamMessage.style.color = "red";
+                    }
+                }
+
+        <!--        // Bắt đầu stream-->
+        <!--        async function startStream() {-->
+        <!--            const streamMessage = document.getElementById("stream-message");-->
+
+        <!--            try {-->
+        <!--                const response = await fetch("/start_stream", { method: "POST" });-->
+        <!--                const data = await response.json();-->
+
+        <!--                if (response.ok) {-->
+        <!--                    streamMessage.textContent = data.message;-->
+        <!--                    streamMessage.style.color = "purple";-->
+        <!--                } else {-->
+        <!--                    streamMessage.textContent = data.message || "An error occurred.";-->
+        <!--                    streamMessage.style.color = "red";-->
+        <!--                }-->
+        <!--            } catch (error) {-->
+        <!--                streamMessage.textContent = "Failed to connect to the server.";-->
+        <!--                streamMessage.style.color = "red";-->
+        <!--            }-->
+        <!--        }-->
+        <!--        // Dừng stream-->
+        <!--        async function stopStream() {-->
+        <!--            const streamMessage = document.getElementById("stream-message");-->
+
+        <!--            try {-->
+        <!--                const response = await fetch("/stop_stream", { method: "POST" });-->
+        <!--                const data = await response.json();-->
+
+        <!--                if (response.ok) {-->
+        <!--                    streamMessage.textContent = data.message;-->
+        <!--                    streamMessage.style.color = "red";-->
+        <!--                } else {-->
+        <!--                    streamMessage.textContent = data.message || "An error occurred.";-->
+        <!--                    streamMessage.style.color = "red";-->
+        <!--                }-->
+        <!--            } catch (error) {-->
+        <!--                streamMessage.textContent = "Failed to connect to the server.";-->
+        <!--                streamMessage.style.color = "red";-->
+        <!--            }-->
+        <!--        }-->
+            </script>
+        </div>
+    </div>
+</body>
+</html>
